@@ -1,6 +1,10 @@
-name: Static analysis
+name: Static analysis (PR)
 
 on: [pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
 
 jobs:
   clang-tidy:
@@ -49,4 +53,6 @@ jobs:
         split_workflow: true
         lgtm_comment_body: ""
     - if: steps.review.outputs.total_comments > 0
-      run: exit 1
+      run: |
+        echo "clang-tidy run has failed. See previous 'Run clang-tidy' stage logs"
+        exit 1
